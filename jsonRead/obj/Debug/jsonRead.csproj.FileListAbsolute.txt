@@ -1,0 +1,6 @@
+E:\Csharp\jsonRead\jsonRead\jsonRead\bin\Debug\jsonRead.exe.config
+E:\Csharp\jsonRead\jsonRead\jsonRead\bin\Debug\jsonRead.exe
+E:\Csharp\jsonRead\jsonRead\jsonRead\bin\Debug\jsonRead.pdb
+E:\Csharp\jsonRead\jsonRead\jsonRead\obj\Debug\jsonRead.csprojResolveAssemblyReference.cache
+E:\Csharp\jsonRead\jsonRead\jsonRead\obj\Debug\jsonRead.exe
+E:\Csharp\jsonRead\jsonRead\jsonRead\obj\Debug\jsonRead.pdb
