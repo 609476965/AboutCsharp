@@ -11,8 +11,8 @@ namespace jsonRead {
     class Program {
         static void Main(string[] args) {
             JsonReader jr = new JsonReader();
-            jr.BatchStorage("D:/SVN/server/bin/config",1);
-            //JsonToSql("hero.json", "hero");
+            //jr.BatchStorage("D:/SVN/server/bin/config",1);
+            jr.JsonToSql(args[0], args[1], null);
         }
     }
 }

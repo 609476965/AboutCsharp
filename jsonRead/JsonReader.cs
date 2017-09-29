@@ -191,6 +191,8 @@ namespace jsonRead {
         public void JsonToSql(string path, string name, string conn) {
             //反序列化json
             try {
+                if (conn == null)
+                    conn = connList[0];
                 CreateProc(conn);
                 string fname = "\"" + name + "\"";
                 JObject a = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(path));
