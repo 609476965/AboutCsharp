@@ -9,6 +9,26 @@ using System.IO;
 namespace jsonRead {
     class JsonReader {
         private List<string> connList = new List<string>();
+        private string sqlStr = @"DROP PROCEDURE IF EXISTS `procCreateAndInsertField`;
+        CREATE DEFINER = `root`@`%` PROCEDURE `procCreateAndInsertField`(IN `tableName` nvarchar(40),IN `sKey` nvarchar(40),IN `ItemKey` nvarchar(40),IN `sItem` nvarchar(40),IN `sType` nvarchar(40))
+        BEGIN
+            set @fname = tableName;
+            set @fkey = ItemKey;
+            set @ftype = sType;
+            IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = @fname AND column_name = @fkey) THEN    
+                set @str1 = concat('ALTER TABLE ',@fname,' ADD ',@fkey,' ',@ftype);
+                PREPARE s from @str1;
+                EXECUTE s;
+                set @str2 = CONCAT('UPDATE ',@fname,' set ',@fkey,' = ',sItem,' where MainKey =', ''',sKey,''');  
+                PREPARE s2 from @str2;
+			    EXECUTE s2;
+            ELSE
+			set @str3 = CONCAT('UPDATE ',@fname,' set ',@fkey,' = ',sItem,' where MainKey =', ''',sKey,''');
+            PREPARE s3 from @str3;
+            EXECUTE s3;
+            END IF;
+        END;
+        ";
 
         public JsonReader() {
             JObject c = (JObject)JsonConvert.DeserializeObject(File.ReadAllText("conn.json"));
@@ -16,6 +36,10 @@ namespace jsonRead {
                 var p = item.Value.ToString();
                 connList.Add(p);
             }
+        }
+
+        public void CreateProc(string conn) {
+            MySqlHelper.ExecuteNonQuery(conn, System.Data.CommandType.Text, sqlStr, null);
         }
 
         //正则表达式验证是否为数字
@@ -28,12 +52,12 @@ namespace jsonRead {
         /// </summary>
         /// <param name="sourcePath">json文件夹路径</param>
         /// <param name="connId">选择数据库连接字符串(从1开始)</param>
-        public void BatchStorage(string sourcePath,int connId) {
+        public void BatchStorage(string sourcePath, int connId) {
             var fileList = ScanningFile(sourcePath);
             foreach (var a in fileList) {
                 string[] arr = Regex.Split(a, "\\\\", RegexOptions.IgnoreCase);
                 string[] rs = Regex.Split(arr[arr.Length - 1], ".json", RegexOptions.IgnoreCase);
-                JsonToSql(a, rs[0], connList[connId-1]);
+                JsonToSql(a, rs[0], connList[connId - 1]);
             }
             Console.ReadKey();
         }
@@ -167,6 +191,7 @@ namespace jsonRead {
         public void JsonToSql(string path, string name, string conn) {
             //反序列化json
             try {
+                CreateProc(conn);
                 string fname = "\"" + name + "\"";
                 JObject a = (JObject)JsonConvert.DeserializeObject(File.ReadAllText(path));
                 //按name新建表，若已存在则不建
